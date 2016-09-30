@@ -1,3 +1,9 @@
+/*
+	Filename: Maze.cpp
+	Modified By: Logan Davis & Autumn Ferree
+	Date Modified: 9/30/2016
+*/
+
 #include "Maze.h"
 #include "Color.h"
 #include "Rect.h"
@@ -48,20 +54,18 @@ Cell* Maze::processBackTrack(StackLinked<Cell>* stack)
    //top_cell is NULL if the stack is empty
    //top_cell's direction is DEAD_END if you need to keep backtracking
 
-   while (                                        )  //need to back track
+   while (top_cell->getDir() == DEAD_END)  //need to back track
    {
-      
-
-
       //remove the cell and set the maze location to BACKTRACK (the maze is a Matrix)
-
-
+	  Cell* dead_cell = stack->pop();
+	  int row = dead_cell->getRow();
+	  int col = dead_cell->getCol();
+	  maze->setElement(row, col, BACKTRACK);
+	  
+	  delete dead_cell;
 
       //look at the next cell
-
-
-
-
+	  top_cell = stack->peek();
 
       Sleep(SLEEP_TIME);      //slow down the maze traversal
       gui->update();  //update whenever the color of a cell has been changed
@@ -74,45 +78,44 @@ bool Maze::isSolved(Cell* curr_cell, StackLinked<Cell>* stack)
 {
    //DO THIS
    //get row and col from curr_cell
-
-
+   int row = curr_cell->getRow();
+   int col = curr_cell->getCol();
 
    //have you solved the maze? (check that we are at the bottom right maze location and that it is a SPACE
-   if (                                                          )  
+   if (row == height && col == width && maze->getElement(row, col) == SPACE)  
    {
 
 
       //set the maze location to TRIED
-
+	  maze->setElement(row, col, TRIED);
 
       //push curr_cell
-
+	  stack->push(curr_cell);
 
       gui->update();
       //return the appropriate boolean
-
+	  return true;
    }
 
 
    //return the appropriate boolean
-   
+   return false;
 }
 
 //backing through the maze, setting the solution color to PATH
 void Maze::processSolution(StackLinked<Cell>* stack)
 {
    //DO THIS
-   //the stack has the solution path stored
-   while(                    )
+   //the stack has the solution path stored  
+   while(!stack->isEmpty())
    {
       //get the next cell from the stack
-
-
+	  Cell* curr_cell = stack->pop();
+	  int row = curr_cell->getRow();
+	  int col = curr_cell->getCol();
       
       //update the maze location to PATH
-
-
-
+	  maze->setElement(row, col, PATH);
 
       gui->update();
    }
@@ -139,7 +142,7 @@ bool Maze::traverse()
 
       //call a method in the Cell class to give you a new Cell in a new direction relative to top_cell (initially, DOWN)
       //DO THIS
-      Cell* curr_cell = 
+      Cell* curr_cell = top_cell->nextCell();
 
       //does this new Cell solve the maze?
       done = isSolved(curr_cell, &stack);
@@ -147,20 +150,16 @@ bool Maze::traverse()
 
       //DO THIS
       //get the row and col from curr_cell
-      int row = 
-      int col = 
+      int row = curr_cell->getRow();
+      int col = curr_cell->getCol();
 
       //check that the current maze location corresponds to SPACE, otherwise delete it
-      if (                                           )
+      if (maze->getElement(row, col) == SPACE)
       {
          //update the maze location to TRIED
          //put the cell on the stack (move forward through the maze)
-
-
-
-
-
-
+		 maze->setElement(row, col, TRIED);
+		 stack.push(curr_cell);
 
          Sleep(SLEEP_TIME);  //slow down the maze traversal
          gui->update();
@@ -169,7 +168,7 @@ bool Maze::traverse()
       {
          //DO THIS
          //delete the cell
-
+		 delete curr_cell;
       }
    }
 
@@ -189,7 +188,7 @@ bool Maze::traverse()
 void Maze::mouseClicked(int x, int y)
 {}
 
-void Maze::draw(Cairo::RefPtr<Cairo::Context> cr, int width, int height)
+void Maze::draw(wxDC& dc, int width, int height)
 {
    int rows = maze->getNumRows();
    int cols = maze->getNumCols();
@@ -221,23 +220,23 @@ void Maze::draw(Cairo::RefPtr<Cairo::Context> cr, int width, int height)
 
          if (val == WALL)
          {
-            blackRect.draw(cr, x_pixel, y_pixel);
+            blackRect.draw(dc, x_pixel, y_pixel);
          }
          else if (val == SPACE)
          {
-            whiteRect.draw(cr, x_pixel, y_pixel);
+            whiteRect.draw(dc, x_pixel, y_pixel);
          }
          else if (val == TRIED)
          {
-            blueRect.draw(cr, x_pixel, y_pixel);
+            blueRect.draw(dc, x_pixel, y_pixel);
          }
          else if (val == BACKTRACK)
          {
-            redRect.draw(cr, x_pixel, y_pixel);
+            redRect.draw(dc, x_pixel, y_pixel);
          }
          else if (val == PATH)
          {
-            greenRect.draw(cr, x_pixel, y_pixel);
+            greenRect.draw(dc, x_pixel, y_pixel);
          }
       }
    }

@@ -1,3 +1,9 @@
+/*
+	Filename: StackLinked.h
+	Modified By: Logan Davis & Autumn Ferree
+	Date Modified: 9/30/2016
+*/
+
 #if !defined (STACKLINKED_H)
 #define STACKLINKED_H
 
